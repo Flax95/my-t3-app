@@ -6,11 +6,23 @@ import Head from "next/head";
 import Image from "next/image";
 import { type RouterOutputs, api } from "~/utils/api";
 import { LoadingPage } from "~/components/loading";
+import { useState } from "react";
 
 dayjs.extend(relativeTime);
 
 const CreatePostWizard = () => {
   const { user } = useUser();
+
+  const [input, setInput] = useState("");
+
+  const ctx = api.useContext();
+
+  const { mutate, isLoading: isPosting } = api.posts.create.useMutation({
+    onSuccess: () => {
+      setInput("");
+      void ctx.posts.getAll.invalidate();
+    },
+  });
 
   if (!user) return null;
 
@@ -28,16 +40,24 @@ const CreatePostWizard = () => {
         type="text"
         placeholder="Type something!"
         className="grow bg-transparent outline-none"
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        disabled={isPosting}
       />
+      <button
+        onClick={() => {
+          mutate({ content: input });
+        }}
+      >
+        Add
+      </button>
     </div>
   );
 };
 
 type PostWithAuthor = RouterOutputs["posts"]["getAll"][number];
 
-const Post = (props: PostWithAuthor) => {
-  const { post, author } = props;
-
+const Post = ({ post, author }: PostWithAuthor) => {
   return (
     <div key={post.id} className=" flex gap-3 border-b border-slate-400 p-4">
       <Image
@@ -55,7 +75,7 @@ const Post = (props: PostWithAuthor) => {
             post.createdAt
           ).fromNow()}`}</span>
         </div>
-        <span>{post.content}</span>
+        <span className=" text-2xl">{post.content}</span>
       </div>
     </div>
   );
