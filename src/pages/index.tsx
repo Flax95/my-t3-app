@@ -1,7 +1,12 @@
-import { SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
 import { type NextPage } from "next";
+import { SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
 import Head from "next/head";
 import { RouterOutputs, api } from "~/utils/api";
+import { type RouterOutputs, api } from "~/utils/api";
+
+dayjs.extend(relativeTime);
 
 const CreatePostWizard = () => {
   const { user } = useUser();
@@ -37,8 +42,11 @@ const Post = (props: PostWithAuthor) => {
         className="h-12 w-12  rounded-full"
       />
       <div className="flex flex-col">
-        <div className=" text-slate-300">
-          <span>{`@${author.username}`}</span> ∙ <span>1 hour ago</span>
+        <div className="flex gap-1 text-slate-300">
+          <span>{`@${author.username}`}</span>
+          <span className="font-thin">{` ∙ ${dayjs(
+            post.createdAt
+          ).fromNow()}`}</span>
         </div>
         <span>{post.content}</span>
       </div>
