@@ -3,7 +3,7 @@ import { SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Head from "next/head";
-import { RouterOutputs, api } from "~/utils/api";
+import Image from "next/image";
 import { type RouterOutputs, api } from "~/utils/api";
 
 dayjs.extend(relativeTime);
@@ -15,10 +15,13 @@ const CreatePostWizard = () => {
 
   return (
     <div className="flex gap-3">
-      <img
+      <Image
         src={user.profileImageUrl}
         alt="Profile image"
         className="h-12 w-12 rounded-full"
+        width={48}
+        height={48}
+        placeholder="empty"
       />
       <input
         type="text"
@@ -36,10 +39,13 @@ const Post = (props: PostWithAuthor) => {
 
   return (
     <div key={post.id} className=" flex gap-3 border-b border-slate-400 p-4">
-      <img
+      <Image
         src={author.profileImageUrl}
         alt="author profile image"
-        className="h-12 w-12  rounded-full"
+        className="h-14 w-14 rounded-full"
+        width={56}
+        height={56}
+        placeholder="empty"
       />
       <div className="flex flex-col">
         <div className="flex gap-1 text-slate-300">
