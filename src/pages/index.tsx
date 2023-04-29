@@ -5,6 +5,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import Head from "next/head";
 import Image from "next/image";
 import { type RouterOutputs, api } from "~/utils/api";
+import { LoadingPage } from "~/components/loading";
 
 dayjs.extend(relativeTime);
 
@@ -60,13 +61,30 @@ const Post = (props: PostWithAuthor) => {
   );
 };
 
-const Home: NextPage = () => {
-  const { data: posts, isLoading } = api.posts.getAll.useQuery();
-  const user = useUser();
+const Feed = () => {
+  const { data: posts, isLoading: postsLoading } = api.posts.getAll.useQuery();
 
-  if (isLoading) return <div>Loading...</div>;
+  if (postsLoading) return <LoadingPage />;
 
   if (!posts) return <div>Something went wrong</div>;
+
+  return (
+    <div className=" text-white">
+      {posts?.map((postWithAuthor) => (
+        <Post key={postWithAuthor.post.id} {...postWithAuthor} />
+      ))}
+    </div>
+  );
+};
+
+const Home: NextPage = () => {
+  const { isLoaded: userLoaded, isSignedIn } = useUser();
+
+  // Start fetching asap (to cache)
+  api.posts.getAll.useQuery();
+
+  // Return empty div if user isn't loaded, since user tends to load fast
+  if (!userLoaded) return <div />;
 
   return (
     <>
@@ -78,25 +96,19 @@ const Home: NextPage = () => {
       <main className="flex h-screen justify-center">
         <div className="w-full border-x border-slate-400 md:max-w-2xl">
           <div className=" border-b border-slate-400 p-4">
-            {!user.isSignedIn && (
+            {!isSignedIn && (
               <div className="flex justify-center">
                 <SignInButton />
               </div>
             )}
-            {!!user.isSignedIn && (
+            {isSignedIn && (
               <>
                 <CreatePostWizard />
                 <SignOutButton />
               </>
             )}
           </div>
-          {!!user.isSignedIn && (
-            <div className=" text-white">
-              {posts?.map((postWithAuthor) => (
-                <Post key={postWithAuthor.post.id} {...postWithAuthor} />
-              ))}
-            </div>
-          )}
+          <Feed />
         </div>
       </main>
     </>
