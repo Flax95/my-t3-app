@@ -1,6 +1,5 @@
 import type { User } from "@clerk/nextjs/dist/api";
 import { clerkClient } from "@clerk/nextjs/server";
-import { TRPCClientError } from "@trpc/client";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import {
@@ -10,9 +9,15 @@ import {
 } from "~/server/api/trpc";
 
 const filterUserForClient = (user: User) => {
+  let username = user.username;
+
+  if (user.firstName || user.lastName) {
+    username = `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim();
+  }
+
   return {
     id: user.id,
-    username: user.username,
+    username: username,
     profileImageUrl: user.profileImageUrl,
   };
 };
