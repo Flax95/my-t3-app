@@ -24,6 +24,14 @@ const CreatePostWizard = () => {
     },
   });
 
+  function submitPost() {
+    mutate({ content: input });
+  }
+
+  function handleKeyPressed(event: React.KeyboardEvent<HTMLInputElement>) {
+    if (event.key === "Enter") submitPost();
+  }
+
   if (!user) return null;
 
   return (
@@ -42,6 +50,7 @@ const CreatePostWizard = () => {
         className="grow bg-transparent outline-none"
         value={input}
         onChange={(e) => setInput(e.target.value)}
+        onKeyDown={handleKeyPressed}
         disabled={isPosting}
       />
       <button
