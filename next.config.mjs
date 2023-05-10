@@ -3,10 +3,15 @@
  * for Docker builds.
  */
 await import("./src/env.mjs");
+import nextPWA from "next-pwa";
 
 /** @type {import("next").NextConfig} */
 const config = {
   reactStrictMode: true,
+  swcMinify: true,
+  compiler: {
+    removeConsole: process.env.NODE_ENV !== "development",
+  },
 
   /**
    * If you have `experimental: { appDir: true }` set, then you must comment the below `i18n` config
@@ -22,4 +27,15 @@ const config = {
     domains: ["images.clerk.dev"],
   },
 };
-export default config;
+
+console.log(nextPWA);
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const withPWA = nextPWA({
+  dest: "public",
+  register: true,
+  skipWaiting: true,
+  disable: process.env.NODE_ENV === "development",
+});
+
+export default withPWA(config);
